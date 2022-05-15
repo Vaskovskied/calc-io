@@ -189,13 +189,9 @@ body {
 }
 
 
-@media screen and (max-width: 900px) {
+@media screen and (max-width: 800px) {
     .display {
         height: 90px;
-    }
-
-    .calc-div {
-        top: 18px;
     }
 
     .calc-div-clicked {
@@ -204,6 +200,14 @@ body {
     }
 
     .circle-clicked {
-        top: calc(-50vh + 580px - 27px);
+        top: calc(290px - 27px - 18px);
+    }
+}
+
+
+/* for galaxy fold */
+@media screen and (max-width: 300px) {
+    html {
+        transform: scale(0.75)
     }
 }
