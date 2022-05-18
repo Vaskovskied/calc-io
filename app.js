@@ -19,7 +19,7 @@ let sign = '' // math sign
 let finish = false; // true if equal is finished properly
 let equalClicked = 0; // the number of clicks on equal button, can't be more than two, it's костыль
 let signChanged = false; // shows that sign is changed 
-let signTemp = sign;
+let signWithoutB = '';
 
 const DIGITS = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
 const ACTIONS = ['+', '−', '×', '÷', 'Vⁿ‾', 'xⁿ'];
@@ -35,7 +35,9 @@ function clearAll() {
     a = '';
     b = '';
     sign = '';
+    signWithoutB = '';
     finish = false;
+    signChanged = false;
     $output.innerText = '0';
     $outputInfo.innerText = '';
 }
@@ -51,20 +53,43 @@ $buttons.forEach(button => {
         };
 
         //backspace
-        if (btnText === '«') {
-            $output.innerText = $output.innerText.slice(0, -1);
-        };
+          // старая логика
+            // if (btnText === '«') {
+            //     $output.innerText = $output.innerText.slice(0, -1);
+            // };
         
-        if (btnText === '«' && b === '') {
-            a = $output.innerText;
-        } else if (btnText === '«' && b !== '') {
-            b = $output.innerText
-        };
+            // if (btnText === '«' && b === '') {
+            //     a = $output.innerText;
+            // } else if (btnText === '«' && b !== '') {
+            //     b = $output.innerText
+            // };
+
+        if (btnText === '«') {
+            if (b === '' && sign === '') {
+                if (a.length <= 1) {
+                    a = '';
+                    $output.innerText = '0';
+                } else {
+                    a = a.substring(0, a.length - 1)
+                    $output.innerText = a;
+                }
+            } else if (a !== '' && b !== '' && finish && equalClicked > 1) {
+                $outputInfo.innerText = '';
+                // or clearAll
+            } else {
+                if (b.length <= 1) {
+                    b = '';
+                    $output.innerText = '0'
+                } else {
+                    b = b.substring(0, b.length - 1)
+                    $output.innerText = b;
+                }
+            }
+        }
 
         //digits
         //dot
         if (!$output.innerText.includes('.') && btnText === '.') {
-            // возможно тоже необходим else if
             if (b === '' && sign === '') {
                 if (a === '') {
                     a = '0.'
@@ -118,7 +143,7 @@ $buttons.forEach(button => {
                 $output.innerText = b;
             }
 
-            if ((b !== '' && a !== '') && signChanged === false && equalClicked > 1) {
+            if (b !== '' && a !== '' && signChanged === false && equalClicked > 1) {
                 clearAll();
                 a = btnText;
                 $output.innerText = a;
@@ -131,14 +156,45 @@ $buttons.forEach(button => {
             signChanged = true;
             $outputInfo.innerText = `${a} ${sign}`;
         }
+
+        // %
+        if (btnText === '%') {
+            if (b === '' && sign === '') {
+                a = '0';
+                $outputInfo.innerText = a;
+                $output.innerText = a;
+            }
+            if (sign === '×' || sign === '÷') {
+                $outputInfo.innerText = `${a} ${sign} ${b}%`
+                b = b / 100;
+                $output.innerText = b
+            }
+            if (sign === '+' || sign === '−') {
+                $outputInfo.innerText = `${a} ${sign} ${b}%`;
+                b = a * (b / 100);
+                $output.innerText = b;
+            }
+            signWithoutB = '%'
+            // console.log('clicked', b)
+        }
     })
 });
 
 
 $circle.addEventListener('click', (e) => {    
-    if (b === '') { b = a }
- 
-    const str1 = `${a} ${sign} ${b} =`;
+    if (b === '') { b = a };
+
+    let str1 = `${a} ${sign} ${b} =`;
+
+    if (signWithoutB === '%') {
+        if (sign === '×' || sign === '÷') {
+            str1 = `${a} ${sign} ${b * 100}% =`;
+        }
+        if (sign === '+' || sign === '−') {
+            str1 = `${a} ${sign} ${100/(a / b)}% =`
+        }
+    }
+
     if (a !== '' && sign !== '' && b !== '') {
         $outputInfo.innerText = str1;
     };
@@ -154,8 +210,13 @@ $circle.addEventListener('click', (e) => {
             a = a * b;
             break;
         case '÷':
+            if (b == 0) {
+                clearAll();
+                $output.innerText = 'error';
+                $outputInfo.innerText = 'can\'t divide by 0';
+                return;
+            };
             a = a / b;
-            // деление на ноль
             break;
         case 'xⁿ': 
             a = Math.pow(a, b)
@@ -172,6 +233,7 @@ $circle.addEventListener('click', (e) => {
 
     finish = true;
     signChanged = false;
+    signWithoutB = '';
     
     if (equalClicked < 2) {
         equalClicked += 1;
