@@ -52,18 +52,6 @@ $buttons.forEach(button => {
             clearAll();
         };
 
-        //backspace
-          // старая логика
-            // if (btnText === '«') {
-            //     $output.innerText = $output.innerText.slice(0, -1);
-            // };
-        
-            // if (btnText === '«' && b === '') {
-            //     a = $output.innerText;
-            // } else if (btnText === '«' && b !== '') {
-            //     b = $output.innerText
-            // };
-
         if (btnText === '«') {
             if (b === '' && sign === '') {
                 if (a.length <= 1) {
@@ -127,6 +115,7 @@ $buttons.forEach(button => {
         if (btnText === '.' && b !== '' &&  a !== '' && signChanged === false && equalClicked > 1) {
             clearAll();
             a = '0.';
+            finish = false;
             $output.innerText = a;
         }
         //digits
@@ -159,23 +148,146 @@ $buttons.forEach(button => {
 
         // %
         if (btnText === '%') {
+            signWithoutB = '%';
+
+            if (b !== '' && a !== '' && signChanged === false && equalClicked > 1) {
+                $outputInfo.innerText = `${a}/100`;
+                a = a/100;
+                $output.innerText = a;
+                
+                signWithoutB = '';
+                // finish = false;
+                return
+            }
+
             if (b === '' && sign === '') {
                 a = '0';
                 $outputInfo.innerText = a;
                 $output.innerText = a;
             }
             if (sign === '×' || sign === '÷') {
+                if (b === '') {
+                    $outputInfo.innerText = `${a} ${sign} 0%`;
+                    return
+                }
                 $outputInfo.innerText = `${a} ${sign} ${b}%`
                 b = b / 100;
                 $output.innerText = b
             }
             if (sign === '+' || sign === '−') {
+                if (b === '') {
+                    $outputInfo.innerText = `${a} ${sign} 0%`;
+                    return
+                }
                 $outputInfo.innerText = `${a} ${sign} ${b}%`;
                 b = a * (b / 100);
                 $output.innerText = b;
             }
-            signWithoutB = '%'
-            // console.log('clicked', b)
+        }
+
+        //1/x
+        if (btnText === '1/x') {
+            signWithoutB = '1/x';
+            if (b !== '' && a !== '' && signChanged === false && equalClicked > 1) {
+                if (a == 0) {
+                    clearAll();
+                    $output.innerText = 'error';
+                    $outputInfo.innerText = 'can\'t divide by 0';
+
+                    signWithoutB = '';
+                    // finish = false;
+                    return;
+                };
+                $outputInfo.innerText  = `1/${a}`;
+                a = 1/a;
+                $output.innerText = a;
+
+                signWithoutB = '';
+                // finish = false;
+                return;
+            }
+            if (b === '' && sign === '') {
+                if (a == 0) {
+                    clearAll();
+                    $output.innerText = 'error';
+                    $outputInfo.innerText = 'can\'t divide by 0';
+                    return;
+                };
+                $outputInfo.innerText = `1/${a}`
+                a = 1/a;
+                $output.innerText = a;
+            } else {
+                if (b == 0) {
+                    clearAll();
+                    $output.innerText = 'error';
+                    $outputInfo.innerText = 'can\'t divide by 0';
+                    return;
+                };
+                $outputInfo.innerText = `${a} ${sign} 1/${b}`
+                b = 1/b;
+                $output.innerText = b;
+            }
+        }
+
+        if (btnText === 'x²') {
+            signWithoutB = 'x²';
+            if (b !== '' && a !== '' && signChanged === false && equalClicked > 1) {
+                if (a ==='') {
+                    $outputInfo.innerText =  `${a} ${sign} 0²`;
+                    return
+                }
+                $outputInfo.innerText  = `${a}²`;
+                a = Math.pow(a, 2);
+                $output.innerText = a;
+
+                signWithoutB = '';
+                // finish = false;
+                return;
+            };
+
+            if (b === '' && sign === '') {
+                $outputInfo.innerText = `${a}²`
+                a = Math.pow(a, 2);
+                $output.innerText = a;
+            } else {
+                if (b ==='') {
+                    $outputInfo.innerText =  `${a} ${sign} 0²`;
+                    return
+                }
+                $outputInfo.innerText = `${a} ${sign} ${b}²`
+                b = Math.pow(b, 2)
+                $output.innerText = b;
+            }
+        }
+
+        if (btnText === 'V‾') {
+            signWithoutB = 'x²';
+            if (b !== '' && a !== '' && signChanged === false && equalClicked > 1) {
+                $outputInfo.innerText  = `V‾${a}`;
+                a = Math.sqrt(a)
+                $output.innerText = a;
+
+                signWithoutB = '';
+                return;
+            };
+
+            if (b === '' && sign === '') {
+                if (a === '') {
+                    $outputInfo.innerText = `V‾0`;
+                    return;
+                }
+                $outputInfo.innerText = `V‾${a}`;
+                a = Math.sqrt(a);
+                $output.innerText = a;
+            } else {
+                if (b === '') {
+                    $outputInfo.innerText = `${a} ${sign} V‾0`;
+                    return;
+                }
+                $outputInfo.innerText = `${a} ${sign} V‾${b}`;
+                b = Math.sqrt(b);
+                $output.innerText = b;
+            }
         }
     })
 });
@@ -183,7 +295,7 @@ $buttons.forEach(button => {
 
 $circle.addEventListener('click', (e) => {    
     if (b === '') { b = a };
-
+    // += для 1/x, и проблемы у =
     let str1 = `${a} ${sign} ${b} =`;
 
     if (signWithoutB === '%') {
@@ -242,4 +354,4 @@ $circle.addEventListener('click', (e) => {
 
 $history.addEventListener('click', (e) => {
     console.log(HISTORY)
-})
+});
