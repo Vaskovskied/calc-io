@@ -11,7 +11,7 @@ $circle.addEventListener('click', function() {
     $calcDiv.classList.add('calc-div-clicked');
     $line0.classList.add('line0-clicked');
     $line1.classList.add('line1-clicked');
-})
+});
 
 let a = ''; // first number
 let b = ''; // second number
@@ -31,6 +31,31 @@ const $output = document.querySelector('.result');
 const $outputInfo = document.querySelector('.output');
 const $buttons = Array.from(document.querySelectorAll('.button'));
 
+function decreaseFontSize(btnText) {
+    let outputFontSize = parseInt(window.getComputedStyle($output).fontSize);
+    let outputInfoFontSize = parseInt(window.getComputedStyle($outputInfo).fontSize);
+
+    if ($output.innerText.length < 13) {
+        $output.style.fontSize = '36px';
+    };
+
+    if ($output.innerText.length >= 12 && outputFontSize >= 20 && (btnText !== 'C' && btnText !== '«' & btnText !== '.')) {
+        $output.style.fontSize = `${36/$output.innerText.length * 11}px`;
+    };
+
+    if ($outputInfo.innerText.length < 13) {
+        $outputInfo.style.fontSize = '24px';
+    };
+
+    if ($outputInfo.innerText.length >= 12 && outputInfoFontSize >= 14 && (btnText !== 'C' && btnText !== '«' & btnText !== '.')) {
+        if ((24/$outputInfo.innerText.length * 14) >= 10) {
+            $outputInfo.style.fontSize = `${24/$outputInfo.innerText.length * 14}px`;
+        } else {
+            $outputInfo.style.fontSize = `${24/$outputInfo.innerText.length * 14 + 2}px`
+        }
+    }
+}
+
 function clearAll() {
     a = '';
     b = '';
@@ -40,7 +65,9 @@ function clearAll() {
     signChanged = false;
     $output.innerText = '0';
     $outputInfo.innerText = '';
-}
+    $output.style.fontSize = '36px';
+    $outputInfo.style.fontSize = '24px';
+};
 
 $buttons.forEach(button => {
     button.addEventListener('click', (e) => {
@@ -57,6 +84,7 @@ $buttons.forEach(button => {
                 if (a.length <= 1) {
                     a = '';
                     $output.innerText = '0';
+                    $outputInfo.innerText = '0'
                 } else {
                     a = a.substring(0, a.length - 1)
                     $output.innerText = a;
@@ -73,6 +101,22 @@ $buttons.forEach(button => {
                     $output.innerText = b;
                 }
             }
+        }
+
+        if (((a+'').length === 20 || (b+'').length === 20) && btnText === '«') {
+            if (a !== '' && sign !== '') {
+                $outputInfo.innerText = `${a} ${sign}`;
+            } else {
+                $outputInfo.innerText = '';
+            }
+        }
+
+        if ((a+'').length >= 21 || (b+'').length >= 21) {
+            if (btnText !== '«' || btnText !== 'C') {
+                $output.innerText = 'error';
+                $outputInfo.innerText = 'number is too long';
+            }
+            return
         }
 
         //digits
@@ -99,14 +143,14 @@ $buttons.forEach(button => {
                 $output.innerText = b;
             }
         } else if ($output.innerText.includes('.') && btnText === '.') {
-            if (b === '' && sign === '') {
+            if (b === '' && sign === '' && a === '') {
                 a = '0.'
                 $output.innerText = a;
             } else if (a !== '' && b !== '' && finish && equalClicked > 1) {
                 b = '0.';
                 $output.innerText = b;
                 finish = false;
-            } else {
+            } else if (b === '' && sign !== '' && a !== '') {
                 b = '0.'
                 $output.innerText = b;
             }
@@ -157,31 +201,30 @@ $buttons.forEach(button => {
                 
                 signWithoutB = '';
                 // finish = false;
-                return
-            }
-
-            if (b === '' && sign === '') {
-                a = '0';
-                $outputInfo.innerText = a;
-                $output.innerText = a;
-            }
-            if (sign === '×' || sign === '÷') {
-                if (b === '') {
-                    $outputInfo.innerText = `${a} ${sign} 0%`;
-                    return
+            } else {
+                if (b === '' && sign === '') {
+                    a = '0';
+                    $outputInfo.innerText = a;
+                    $output.innerText = a;
                 }
-                $outputInfo.innerText = `${a} ${sign} ${b}%`
-                b = b / 100;
-                $output.innerText = b
-            }
-            if (sign === '+' || sign === '−') {
-                if (b === '') {
-                    $outputInfo.innerText = `${a} ${sign} 0%`;
-                    return
+                if (sign === '×' || sign === '÷') {
+                    if (b === '') {
+                        $outputInfo.innerText = `${a} ${sign} 0%`;
+                    } else {
+                        $outputInfo.innerText = `${a} ${sign} ${b}%`;
+                        b = b / 100;
+                        $output.innerText = b;
+                    };
                 }
-                $outputInfo.innerText = `${a} ${sign} ${b}%`;
-                b = a * (b / 100);
-                $output.innerText = b;
+                if (sign === '+' || sign === '−') {
+                    if (b === '') {
+                        $outputInfo.innerText = `${a} ${sign} 0%`;
+                    } else {
+                        $outputInfo.innerText = `${a} ${sign} ${b}%`;
+                        b = a * (b / 100);
+                        $output.innerText = b;
+                    }
+                }
             }
         }
 
@@ -196,36 +239,36 @@ $buttons.forEach(button => {
 
                     signWithoutB = '';
                     // finish = false;
-                    return;
-                };
-                $outputInfo.innerText  = `1/${a}`;
-                a = 1/a;
-                $output.innerText = a;
-
-                signWithoutB = '';
-                // finish = false;
-                return;
-            }
-            if (b === '' && sign === '') {
-                if (a == 0) {
-                    clearAll();
-                    $output.innerText = 'error';
-                    $outputInfo.innerText = 'can\'t divide by 0';
-                    return;
-                };
-                $outputInfo.innerText = `1/${a}`
-                a = 1/a;
-                $output.innerText = a;
+                } else {
+                    $outputInfo.innerText  = `1/${a}`;
+                    a = 1/a;
+                    $output.innerText = a;
+    
+                    signWithoutB = '';
+                    // finish = false;
+                }
             } else {
-                if (b == 0) {
-                    clearAll();
-                    $output.innerText = 'error';
-                    $outputInfo.innerText = 'can\'t divide by 0';
-                    return;
-                };
-                $outputInfo.innerText = `${a} ${sign} 1/${b}`
-                b = 1/b;
-                $output.innerText = b;
+                if (b === '' && sign === '') {
+                    if (a == 0) {
+                        clearAll();
+                        $output.innerText = 'error';
+                        $outputInfo.innerText = 'can\'t divide by 0';
+                    } else {
+                        $outputInfo.innerText = `1/${a}`
+                        a = 1/a;
+                        $output.innerText = a;
+                    }
+                } else {
+                    if (b == 0) {
+                        clearAll();
+                        $output.innerText = 'error';
+                        $outputInfo.innerText = 'can\'t divide by 0';
+                    } else {
+                        $outputInfo.innerText = `${a} ${sign} 1/${b}`
+                        b = 1/b;
+                        $output.innerText = b;
+                    }
+                }
             }
         }
 
@@ -234,29 +277,28 @@ $buttons.forEach(button => {
             if (b !== '' && a !== '' && signChanged === false && equalClicked > 1) {
                 if (a ==='') {
                     $outputInfo.innerText =  `${a} ${sign} 0²`;
-                    return
-                }
-                $outputInfo.innerText  = `${a}²`;
+                } else {
+                    $outputInfo.innerText  = `${a}²`;
                 a = Math.pow(a, 2);
                 $output.innerText = a;
 
                 signWithoutB = '';
                 // finish = false;
-                return;
-            };
-
-            if (b === '' && sign === '') {
-                $outputInfo.innerText = `${a}²`
-                a = Math.pow(a, 2);
-                $output.innerText = a;
-            } else {
-                if (b ==='') {
-                    $outputInfo.innerText =  `${a} ${sign} 0²`;
-                    return
                 }
-                $outputInfo.innerText = `${a} ${sign} ${b}²`
-                b = Math.pow(b, 2)
-                $output.innerText = b;
+            } else {
+                if (b === '' && sign === '') {
+                    $outputInfo.innerText = `${a}²`
+                    a = Math.pow(a, 2);
+                    $output.innerText = a;
+                } else {
+                    if (b ==='') {
+                        $outputInfo.innerText =  `${a} ${sign} 0²`;
+                    } else {
+                        $outputInfo.innerText = `${a} ${sign} ${b}²`
+                        b = Math.pow(b, 2)
+                        $output.innerText = b;
+                    }
+                }
             }
         }
 
@@ -268,27 +310,28 @@ $buttons.forEach(button => {
                 $output.innerText = a;
 
                 signWithoutB = '';
-                return;
-            };
-
-            if (b === '' && sign === '') {
-                if (a === '') {
-                    $outputInfo.innerText = `V‾0`;
-                    return;
-                }
-                $outputInfo.innerText = `V‾${a}`;
-                a = Math.sqrt(a);
-                $output.innerText = a;
             } else {
-                if (b === '') {
-                    $outputInfo.innerText = `${a} ${sign} V‾0`;
-                    return;
+                if (b === '' && sign === '') {
+                    if (a === '') {
+                        $outputInfo.innerText = `V‾0`;
+                    } else {
+                        $outputInfo.innerText = `V‾${a}`;
+                        a = Math.sqrt(a);
+                        $output.innerText = a;
+                    }   
+                } else {
+                    if (b === '') {
+                        $outputInfo.innerText = `${a} ${sign} V‾0`;
+                    } else {
+                        $outputInfo.innerText = `${a} ${sign} V‾${b}`;
+                        b = Math.sqrt(b);
+                        $output.innerText = b;
+                    }
                 }
-                $outputInfo.innerText = `${a} ${sign} V‾${b}`;
-                b = Math.sqrt(b);
-                $output.innerText = b;
             }
-        }
+        };
+
+        decreaseFontSize(btnText);
     })
 });
 
@@ -326,9 +369,9 @@ $circle.addEventListener('click', (e) => {
                 clearAll();
                 $output.innerText = 'error';
                 $outputInfo.innerText = 'can\'t divide by 0';
-                return;
+            } else {
+                a = a / b;
             };
-            a = a / b;
             break;
         case 'xⁿ': 
             a = Math.pow(a, b)
@@ -349,6 +392,15 @@ $circle.addEventListener('click', (e) => {
     
     if (equalClicked < 2) {
         equalClicked += 1;
+    }
+
+    decreaseFontSize('');
+
+    if ($output.innerText.length >= 20) {
+        $output.innerText = 'error';
+        $outputInfo.innerText = 'You maliciously or curiously try to break program. The clear all function will be executed in 5 seconds';
+        $outputInfo.style.fontSize = '10px';
+        setTimeout(clearAll, 5000);
     }
 });
 

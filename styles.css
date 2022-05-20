@@ -175,11 +175,16 @@ body {
 }
 
 .output {
-    height: 24px;
+    /* height: 24px; */
     font-weight: 600;
 }
 
 .result {
+    /* display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center; */
+    text-align: end;
     margin-top: 8px;
     font-size: 36px;
 }
@@ -224,7 +229,6 @@ body {
     z-index: 3;
 }
 
-
 @media screen and (max-width: 800px) {
     .display {
         height: 90px;
@@ -246,11 +250,11 @@ body {
     }
 }
 
-
 /* for galaxy fold */
 @media screen and (max-width: 300px) {
     html {
         transform: scale(0.75)
     }
 }
+
 
