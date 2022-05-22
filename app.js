@@ -1,4 +1,5 @@
 'use strict';
+// import BigNumber from './bignumber/bignumber.mjs';
 
 const $circle = document.getElementById('equal')
 const $calcDiv = document.querySelector('.calc-div');
@@ -23,7 +24,7 @@ let signWithoutB = '';
 
 const DIGITS = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
 const ACTIONS = ['+', '−', '×', '÷', 'Vⁿ‾', 'xⁿ'];
-const ACTIONSwithoutB = ['V‾', 'x²', '1/x', '%'];
+const ACTIONSwithoutB = ['√', 'x²', '1/x', '%'];
 
 const HISTORY = [];
 
@@ -81,12 +82,12 @@ $buttons.forEach(button => {
 
         if (btnText === '«') {
             if (b === '' && sign === '') {
-                if (a.length <= 1) {
+                if (a.toString().length <= 1) {
                     a = '';
                     $output.innerText = '0';
                     $outputInfo.innerText = '0'
                 } else {
-                    a = a.substring(0, a.length - 1)
+                    a = a.toString().substring(0, a.toString().length - 1)
                     $output.innerText = a;
                 }
             } else if (a !== '' && b !== '' && finish && equalClicked > 1) {
@@ -97,13 +98,13 @@ $buttons.forEach(button => {
                     b = '';
                     $output.innerText = '0'
                 } else {
-                    b = b.substring(0, b.length - 1)
+                    b = b.toString().substring(0, b.toString().length - 1)
                     $output.innerText = b;
                 }
             }
         }
 
-        if (((a+'').length === 20 || (b+'').length === 20) && btnText === '«') {
+        if ((a.toString().length === 20 || b.toString().length === 20) && btnText === '«') {
             if (a !== '' && sign !== '') {
                 $outputInfo.innerText = `${a} ${sign}`;
             } else {
@@ -111,7 +112,7 @@ $buttons.forEach(button => {
             }
         }
 
-        if ((a+'').length >= 21 || (b+'').length >= 21) {
+        if (a.toString().length >= 21 || b.toString().length >= 21) {
             if (btnText !== '«' || btnText !== 'C') {
                 $output.innerText = 'error';
                 $outputInfo.innerText = 'number is too long';
@@ -162,6 +163,7 @@ $buttons.forEach(button => {
             finish = false;
             $output.innerText = a;
         }
+
         //digits
         if (DIGITS.includes(btnText)) {
             if (b === '' && sign === '') {
@@ -185,6 +187,9 @@ $buttons.forEach(button => {
         
         //signs
         if (ACTIONS.includes(btnText)) {
+            if (a === '') {
+                a = 0;
+            }
             sign = btnText;
             signChanged = true;
             $outputInfo.innerText = `${a} ${sign}`;
@@ -196,11 +201,10 @@ $buttons.forEach(button => {
 
             if (b !== '' && a !== '' && signChanged === false && equalClicked > 1) {
                 $outputInfo.innerText = `${a}/100`;
-                a = a/100;
+                a = BigNumber(a).dividedBy(100);
                 $output.innerText = a;
                 
                 signWithoutB = '';
-                // finish = false;
             } else {
                 if (b === '' && sign === '') {
                     a = '0';
@@ -209,21 +213,19 @@ $buttons.forEach(button => {
                 }
                 if (sign === '×' || sign === '÷') {
                     if (b === '') {
-                        $outputInfo.innerText = `${a} ${sign} 0%`;
-                    } else {
-                        $outputInfo.innerText = `${a} ${sign} ${b}%`;
-                        b = b / 100;
-                        $output.innerText = b;
-                    };
+                        b = a;
+                    } 
+                    $outputInfo.innerText = `${a} ${sign} ${b}%`;
+                    b = BigNumber(b).dividedBy(100);
+                    $output.innerText = b;;
                 }
                 if (sign === '+' || sign === '−') {
                     if (b === '') {
-                        $outputInfo.innerText = `${a} ${sign} 0%`;
-                    } else {
-                        $outputInfo.innerText = `${a} ${sign} ${b}%`;
-                        b = a * (b / 100);
-                        $output.innerText = b;
+                        b = a;
                     }
+                    $outputInfo.innerText = `${a} ${sign} ${b}%`;
+                    b = BigNumber(a).multipliedBy(BigNumber(b).dividedBy(100));
+                    $output.innerText = b;
                 }
             }
         }
@@ -232,113 +234,147 @@ $buttons.forEach(button => {
         if (btnText === '1/x') {
             signWithoutB = '1/x';
             if (b !== '' && a !== '' && signChanged === false && equalClicked > 1) {
-                if (a == 0) {
+                if (a.toString() === '0') {
                     clearAll();
                     $output.innerText = 'error';
                     $outputInfo.innerText = 'can\'t divide by 0';
-
                     signWithoutB = '';
-                    // finish = false;
                 } else {
                     $outputInfo.innerText  = `1/${a}`;
-                    a = 1/a;
+                    a = BigNumber(1).dividedBy(a);
                     $output.innerText = a;
     
                     signWithoutB = '';
-                    // finish = false;
                 }
             } else {
                 if (b === '' && sign === '') {
-                    if (a == 0) {
+                    if (a.toString() === '0' || a.toString() === '') {
                         clearAll();
                         $output.innerText = 'error';
                         $outputInfo.innerText = 'can\'t divide by 0';
                     } else {
-                        $outputInfo.innerText = `1/${a}`
-                        a = 1/a;
+                        $outputInfo.innerText = `1/${a}`;
+                        a = BigNumber(1).dividedBy(a);
                         $output.innerText = a;
                     }
                 } else {
-                    if (b == 0) {
+                    if (b.toString() === '0') {
                         clearAll();
                         $output.innerText = 'error';
                         $outputInfo.innerText = 'can\'t divide by 0';
-                    } else {
-                        $outputInfo.innerText = `${a} ${sign} 1/${b}`
-                        b = 1/b;
+                    } else if (b.toString() === '') {
+                        $outputInfo.innerText = `${a} ${sign} 1/${a}`;
+                        b = BigNumber(1).dividedBy(a);
                         $output.innerText = b;
-                    }
-                }
-            }
-        }
-
-        if (btnText === 'x²') {
-            signWithoutB = 'x²';
-            if (b !== '' && a !== '' && signChanged === false && equalClicked > 1) {
-                if (a ==='') {
-                    $outputInfo.innerText =  `${a} ${sign} 0²`;
-                } else {
-                    $outputInfo.innerText  = `${a}²`;
-                a = Math.pow(a, 2);
-                $output.innerText = a;
-
-                signWithoutB = '';
-                // finish = false;
-                }
-            } else {
-                if (b === '' && sign === '') {
-                    $outputInfo.innerText = `${a}²`
-                    a = Math.pow(a, 2);
-                    $output.innerText = a;
-                } else {
-                    if (b ==='') {
-                        $outputInfo.innerText =  `${a} ${sign} 0²`;
                     } else {
-                        $outputInfo.innerText = `${a} ${sign} ${b}²`
-                        b = Math.pow(b, 2)
-                        $output.innerText = b;
-                    }
-                }
-            }
-        }
-
-        if (btnText === 'V‾') {
-            signWithoutB = 'x²';
-            if (b !== '' && a !== '' && signChanged === false && equalClicked > 1) {
-                $outputInfo.innerText  = `V‾${a}`;
-                a = Math.sqrt(a)
-                $output.innerText = a;
-
-                signWithoutB = '';
-            } else {
-                if (b === '' && sign === '') {
-                    if (a === '') {
-                        $outputInfo.innerText = `V‾0`;
-                    } else {
-                        $outputInfo.innerText = `V‾${a}`;
-                        a = Math.sqrt(a);
-                        $output.innerText = a;
-                    }   
-                } else {
-                    if (b === '') {
-                        $outputInfo.innerText = `${a} ${sign} V‾0`;
-                    } else {
-                        $outputInfo.innerText = `${a} ${sign} V‾${b}`;
-                        b = Math.sqrt(b);
+                        $outputInfo.innerText = `${a} ${sign} 1/${b}`;
+                        b = BigNumber(1).dividedBy(b);
                         $output.innerText = b;
                     }
                 }
             }
         };
 
+        if (btnText === 'x²') {
+            signWithoutB = 'x²';
+            if (b !== '' && a !== '' && signChanged === false && equalClicked > 1) {
+                // if (a.toString() === '') {
+                //     a = 0;
+                // }
+                $outputInfo.innerText  = `${a}²`;
+                a =  BigNumber(a).exponentiatedBy(2);
+                $output.innerText = a;
+
+                signWithoutB = '';
+            } else {
+                if (b === '' && sign === '') {
+                    if (a.toString() === '') {
+                        a = 0;
+                    }
+                    $outputInfo.innerText = `${a}²`;
+                    a = BigNumber(a).exponentiatedBy(2);
+                    $output.innerText = a;
+                } else {
+                    if (b.toString() === '') {
+                        b = a;
+                    }
+                    $outputInfo.innerText = `${a} ${sign} ${b}²`
+                    b = BigNumber(b).exponentiatedBy(2);
+                    $output.innerText = b;
+                    }
+                }
+            }
+
+        if (btnText === '√') {
+            signWithoutB = '√';
+            if (b !== '' && a !== '' && signChanged === false && equalClicked > 1) {
+                $outputInfo.innerText  = `√${a}`;
+                a = BigNumber(a).squareRoot();
+                $output.innerText = a;
+
+                signWithoutB = '';
+            } else {
+                if (b === '' && sign === '') {
+                    if (a === '') {
+                        a = 0;
+                    }
+                    $outputInfo.innerText = `√${a}`;
+                    a = BigNumber(a).squareRoot();
+                    $output.innerText = a;
+                } else {
+                    if (b === '') {
+                        b = a;
+                    }
+                    $outputInfo.innerText = `${a} ${sign} √${b}`;
+                    b = BigNumber(b).squareRoot();
+                    $output.innerText = b;
+                }
+            }
+        };
+        
+        if (btnText === '+/−') {
+            signWithoutB = 'x/−';
+            if (b !== '' && a !== '' && signChanged === false && equalClicked > 1) {
+                a = BigNumber(a).negated();
+                $output.innerText = a;
+                signWithoutB = '';
+            } else {
+                if (b === '' && sign === '') {
+                        // if (a === '') { show 0, 0 }
+                        if (a === '') {
+                            $output.innerText = '0';
+                            // $outputInfo.innerText = '0';
+                        } else {
+                            a = BigNumber(a).negated();
+                            $output.innerText = a;
+                        }
+                } else {
+                        if (b === '') {
+                            b = BigNumber(a).negated();
+                        } else {
+                            b = BigNumber(b).negated();
+                        };
+                        $output.innerText = b;
+                    }
+                }
+            }
+
         decreaseFontSize(btnText);
     })
 });
 
 
-$circle.addEventListener('click', (e) => {    
+$circle.addEventListener('click', (e) => {
+    if (equalClicked < 2) {
+        equalClicked += 1;
+    }
+    
+    if (a === '' && equalClicked > 1) {
+        a = '0';
+    }
+
     if (b === '') { b = a };
-    // += для 1/x, и проблемы у =
+
     let str1 = `${a} ${sign} ${b} =`;
 
     if (signWithoutB === '%') {
@@ -356,13 +392,13 @@ $circle.addEventListener('click', (e) => {
 
     switch (sign) {
         case '+':
-            a = +a + +b;
+            a = BigNumber(a).plus(BigNumber(b));
             break;
         case '−':
-            a = a - b;
+            a = BigNumber(a).minus(BigNumber(b));
             break;
         case '×': 
-            a = a * b;
+            a = BigNumber(a).multipliedBy(BigNumber(b));
             break;
         case '÷':
             if (b == 0) {
@@ -370,29 +406,22 @@ $circle.addEventListener('click', (e) => {
                 $output.innerText = 'error';
                 $outputInfo.innerText = 'can\'t divide by 0';
             } else {
-                a = a / b;
+                a = BigNumber(a).dividedBy(BigNumber(b));
             };
             break;
         case 'xⁿ': 
-            a = Math.pow(a, b)
-            break;
-        case 'Vⁿ‾': 
-            a = a ** (1/b)
+            a = BigNumber(a).exponentiatedBy(BigNumber(b));
             break;
     }
 
     if (a !== '' && sign !== '') {
-        $output.textContent = a;
+        $output.innerText = a;
         HISTORY.push(str1.concat(' ', a));
     }
 
     finish = true;
     signChanged = false;
     signWithoutB = '';
-    
-    if (equalClicked < 2) {
-        equalClicked += 1;
-    }
 
     decreaseFontSize('');
 

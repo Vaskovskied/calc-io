@@ -9,7 +9,7 @@
 html {
     font-size: 64px;
     font-family: 'Montserrat' ,sans-serif;
-    font-weight: bold;
+    font-weight: 400;
 }
 
 body {
@@ -176,7 +176,7 @@ body {
 
 .output {
     /* height: 24px; */
-    font-weight: 600;
+    font-weight: 400;
 }
 
 .result {
@@ -210,6 +210,10 @@ body {
     border-radius: 50%;
     background-color: white;
     box-shadow: 0 6px 10px 0 rgba(0,0,0,0.14), 0 1px 18px 0 rgba(0,0,0,0.12), 0 3px 5px 0 rgba(0,0,0,0.20);
+}
+
+#plus-btn, #minus-btn, #multiply-btn, #divide-btn, #delete-btn {
+    font-weight: bold;
 }
 
 .btn-without-margin {
