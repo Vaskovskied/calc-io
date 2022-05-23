@@ -23,8 +23,8 @@ let signChanged = false; // shows that sign is changed
 let signWithoutB = '';
 
 const DIGITS = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
-const ACTIONS = ['+', '−', '×', '÷', 'Vⁿ‾', 'xⁿ'];
-const ACTIONSwithoutB = ['√', 'x²', '1/x', '%'];
+const ACTIONS = ['+', '−', '×', '÷', 'xⁿ'];
+const ACTIONSwithoutB = ['√', 'x²', '1/x', '%', '+/−'];
 
 const HISTORY = [];
 
@@ -40,7 +40,7 @@ function decreaseFontSize(btnText) {
         $output.style.fontSize = '36px';
     };
 
-    if ($output.innerText.length >= 12 && outputFontSize >= 20 && (btnText !== 'C' && btnText !== '«' & btnText !== '.')) {
+    if ($output.innerText.length >= 12 && outputFontSize >= 23 && (btnText !== 'C' && btnText !== '«' & btnText !== '.')) {
         $output.style.fontSize = `${36/$output.innerText.length * 11}px`;
     };
 
@@ -80,6 +80,7 @@ $buttons.forEach(button => {
             clearAll();
         };
 
+        //deletesymbol
         if (btnText === '«') {
             if (b === '' && sign === '') {
                 if (a.toString().length <= 1) {
@@ -104,25 +105,51 @@ $buttons.forEach(button => {
             }
         }
 
-        if ((a.toString().length === 20 || b.toString().length === 20) && btnText === '«') {
-            if (a !== '' && sign !== '') {
-                $outputInfo.innerText = `${a} ${sign}`;
-            } else {
-                $outputInfo.innerText = '';
+        //limit on 18 numbers
+        if (b === '' && sign === '') {
+            if (a.toString().length === 18) {
+                if (ACTIONS.includes(btnText) === false && ACTIONSwithoutB.includes(btnText) === false && btnText !== '«') {
+                    return;
+                }
             }
-        }
-
-        if (a.toString().length >= 21 || b.toString().length >= 21) {
-            if (btnText !== '«' || btnText !== 'C') {
-                $output.innerText = 'error';
-                $outputInfo.innerText = 'number is too long';
+            if (btnText === '«' && a.toString().length === 17) {
+                if (a !== '' && sign !== '') {
+                    $outputInfo.innerText = `${a} ${sign}`;
+                } else {
+                    $outputInfo.innerText = '';
+                }
             }
-            return
-        }
+        } else if (a !== '' && b !== '' && finish && equalClicked === 1) {
+            if (b.toString().length === 18) {
+                if (ACTIONS.includes(btnText) === false && ACTIONSwithoutB.includes(btnText) === false && btnText !== '«') {
+                    return;
+                }
+            }
+            if (btnText === '«' && b.toString().length === 17) {
+                if (a !== '' && sign !== '') {
+                    $outputInfo.innerText = `${a} ${sign}`;
+                } else {
+                    $outputInfo.innerText = '';
+                }
+            }
+        } else if (a !== '' && b !== '' && finish === false && equalClicked > 1) {
+            if (b.toString().length === 18) {
+                if (ACTIONS.includes(btnText) === false && ACTIONSwithoutB.includes(btnText) === false && btnText !== '«') {
+                    return;
+                }
+            }
+            if (btnText === '«' && b.toString().length === 17) {
+                if (a !== '' && sign !== '') {
+                    $outputInfo.innerText = `${a} ${sign}`;
+                } else {
+                    $outputInfo.innerText = '';
+                }
+            }
+        };
 
         //digits
         //dot
-        if (!$output.innerText.includes('.') && btnText === '.') {
+        if ($output.innerText.includes('.') === false && btnText === '.') {
             if (b === '' && sign === '') {
                 if (a === '') {
                     a = '0.'
@@ -215,7 +242,7 @@ $buttons.forEach(button => {
                     if (b === '') {
                         b = a;
                     } 
-                    $outputInfo.innerText = `${a} ${sign} ${b}%`;
+                    $outputInfo.innerText = `${a} ${sign} ${BigNumber(b)}%`;
                     b = BigNumber(b).dividedBy(100);
                     $output.innerText = b;;
                 }
@@ -223,9 +250,17 @@ $buttons.forEach(button => {
                     if (b === '') {
                         b = a;
                     }
-                    $outputInfo.innerText = `${a} ${sign} ${b}%`;
+                    $outputInfo.innerText = `${a} ${sign} ${BigNumber(b)}%`;
                     b = BigNumber(a).multipliedBy(BigNumber(b).dividedBy(100));
                     $output.innerText = b;
+                }
+
+                if (a.toString().length > 18) {
+                    a = a.toString().substring(0, 18);
+                }
+
+                if (b.toString().length > 18) {
+                    b = b.toString().substring(0, 18);
                 }
             }
         }
@@ -273,6 +308,14 @@ $buttons.forEach(button => {
                     }
                 }
             }
+
+            if (a.toString().length > 18) {
+                a = a.toString().substring(0, 18);
+            }
+
+            if (b.toString().length > 18) {
+                b = b.toString().substring(0, 18);
+            }
         };
 
         if (btnText === 'x²') {
@@ -303,6 +346,14 @@ $buttons.forEach(button => {
                     $output.innerText = b;
                     }
                 }
+
+                if (a.toString().length > 18) {
+                    a = a.toString().substring(0, 18);
+                }
+
+                if (b.toString().length > 18) {
+                    b = b.toString().substring(0, 18);
+                }
             }
 
         if (btnText === '√') {
@@ -328,6 +379,13 @@ $buttons.forEach(button => {
                     $outputInfo.innerText = `${a} ${sign} √${b}`;
                     b = BigNumber(b).squareRoot();
                     $output.innerText = b;
+                }
+
+                if (a.toString().length > 18) {
+                    a = a.toString().substring(0, 18);
+                }
+                if (b.toString().length > 18) {
+                    b = b.toString().substring(0, 18);
                 }
             }
         };
@@ -367,24 +425,26 @@ $buttons.forEach(button => {
 $circle.addEventListener('click', (e) => {
     if (equalClicked < 2) {
         equalClicked += 1;
-    }
+    };
     
     if (a === '' && equalClicked > 1) {
         a = '0';
-    }
+    };
 
     if (b === '') { b = a };
 
     let str1 = `${a} ${sign} ${b} =`;
 
     if (signWithoutB === '%') {
-        if (sign === '×' || sign === '÷') {
-            str1 = `${a} ${sign} ${b * 100}% =`;
-        }
-        if (sign === '+' || sign === '−') {
-            str1 = `${a} ${sign} ${100/(a / b)}% =`
-        }
-    }
+        // if (sign === '×' || sign === '÷') {
+        //     str1 = `${a} ${sign} ${BigNumber(b).multipliedBy(100).toString()}% =`;
+        // }
+        // if (sign === '+' || sign === '−') {
+        //     str1 = `${a} ${sign} ${BigNumber(100).dividedBy(BigNumber(a).dividedBy(b))}% =`
+        //     // подумать}
+        // }
+        str1 = `${$outputInfo.innerText} =`;
+    };
 
     if (a !== '' && sign !== '' && b !== '') {
         $outputInfo.innerText = str1;
@@ -412,6 +472,10 @@ $circle.addEventListener('click', (e) => {
         case 'xⁿ': 
             a = BigNumber(a).exponentiatedBy(BigNumber(b));
             break;
+    };
+
+    if (a.toString().length > 18) {
+        a = a.toString().substring(0, 18);
     }
 
     if (a !== '' && sign !== '') {
@@ -424,13 +488,6 @@ $circle.addEventListener('click', (e) => {
     signWithoutB = '';
 
     decreaseFontSize('');
-
-    if ($output.innerText.length >= 20) {
-        $output.innerText = 'error';
-        $outputInfo.innerText = 'You maliciously or curiously try to break program. The clear all function will be executed in 5 seconds';
-        $outputInfo.style.fontSize = '10px';
-        setTimeout(clearAll, 5000);
-    }
 });
 
 $history.addEventListener('click', (e) => {
