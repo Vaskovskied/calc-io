@@ -80,7 +80,6 @@ $buttons.forEach(button => {
                 if (a.toString().length <= 1) {
                     a = '';
                     $output.innerText = '0';
-                    $outputInfo.innerText = '0'
                 } else {
                     a = a.toString().substring(0, a.toString().length - 1)
                     $output.innerText = a;
@@ -188,6 +187,9 @@ $buttons.forEach(button => {
         //digits
         if (DIGITS.includes(btnText)) {
             if (b === '' && sign === '') {
+                // if (a.toString().length === 1 && a.toString()[0] === '0' && btnText === '0') {
+                //     return
+                // }
                 a += btnText;
                 $output.innerText = a;
             } else if (a !== '' && b !== '' && finish && equalClicked > 1) {
@@ -195,6 +197,9 @@ $buttons.forEach(button => {
                 $output.innerText = b;
                 finish = false;
             } else {
+                // if (b.toString().length === 1 && b.toString()[0] === '0' && btnText === '0') {
+                //     return
+                // }
                 b += btnText;
                 $output.innerText = b;
             }
@@ -506,19 +511,28 @@ function createHistoryElement(info, result) {
 
 function deleteHistory() {
     const $historyItems = Array.from(document.querySelectorAll('.history-display'));
+    const $historySpan = $historyBtn.querySelector('span');
+
     $historyItems.forEach(item => {
         item.remove();
     })
+    $historyDiv.classList.remove('history-div-clicked');
+    $circle.classList.remove('circle-history');
+    $line0.classList.remove('line0-history');
+    $line1.classList.remove('line1-history');
+    $historySpan.classList.remove('history-span-clicked');
     HISTORY = [];
 };
 
 $historyBtn.addEventListener('click', (e) => {
     const $historyItems = Array.from(document.querySelectorAll('.history-display'));
+    const $historySpan = $historyBtn.querySelector('span');
 
     $historyDiv.classList.toggle('history-div-clicked');
     $line0.classList.toggle('line0-history');
     $line1.classList.toggle('line1-history');
     $circle.classList.toggle('circle-history');
+    $historySpan.classList.toggle('history-span-clicked');
     
     $historyItems.forEach(item => {
         item.addEventListener('click', (e) => {
@@ -530,6 +544,9 @@ $historyBtn.addEventListener('click', (e) => {
             $circle.classList.remove('circle-history');
             $line0.classList.remove('line0-history');
             $line1.classList.remove('line1-history');
+            $historySpan.classList.remove('history-span-clicked');
+
+            decreaseFontSize('');
         })
     })
 });
