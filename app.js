@@ -5,14 +5,8 @@ const $circle = document.getElementById('equal')
 const $calcDiv = document.querySelector('.calc-div');
 const $line0 = document.querySelector('.line0');
 const $line1 = document.querySelector('.line1');
-const $history = document.querySelector('.history');
-
-$circle.addEventListener('click', function() {
-    $circle.classList.add('circle-clicked');
-    $calcDiv.classList.add('calc-div-clicked');
-    $line0.classList.add('line0-clicked');
-    $line1.classList.add('line1-clicked');
-});
+const $historyBtn = document.querySelector('.history');
+const $historyDiv = document.querySelector('.history-div');
 
 let a = ''; // first number
 let b = ''; // second number
@@ -26,7 +20,7 @@ const DIGITS = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
 const ACTIONS = ['+', '−', '×', '÷', 'xⁿ'];
 const ACTIONSwithoutB = ['√', 'x²', '1/x', '%', '+/−'];
 
-const HISTORY = [];
+let HISTORY = [];
 
 const $output = document.querySelector('.result');
 const $outputInfo = document.querySelector('.output');
@@ -321,9 +315,6 @@ $buttons.forEach(button => {
         if (btnText === 'x²') {
             signWithoutB = 'x²';
             if (b !== '' && a !== '' && signChanged === false && equalClicked > 1) {
-                // if (a.toString() === '') {
-                //     a = 0;
-                // }
                 $outputInfo.innerText  = `${a}²`;
                 a =  BigNumber(a).exponentiatedBy(2);
                 $output.innerText = a;
@@ -423,6 +414,17 @@ $buttons.forEach(button => {
 
 
 $circle.addEventListener('click', (e) => {
+    if ($historyDiv.classList.contains('history-div-clicked')) {
+        deleteHistory();
+        return;
+    };
+
+    $circle.classList.add('circle-clicked');
+    $calcDiv.classList.add('calc-div-clicked');
+    $line0.classList.add('line0-clicked');
+    $line1.classList.add('line1-clicked');
+
+
     if (equalClicked < 2) {
         equalClicked += 1;
     };
@@ -436,13 +438,6 @@ $circle.addEventListener('click', (e) => {
     let str1 = `${a} ${sign} ${b} =`;
 
     if (signWithoutB === '%') {
-        // if (sign === '×' || sign === '÷') {
-        //     str1 = `${a} ${sign} ${BigNumber(b).multipliedBy(100).toString()}% =`;
-        // }
-        // if (sign === '+' || sign === '−') {
-        //     str1 = `${a} ${sign} ${BigNumber(100).dividedBy(BigNumber(a).dividedBy(b))}% =`
-        //     // подумать}
-        // }
         str1 = `${$outputInfo.innerText} =`;
     };
 
@@ -480,7 +475,8 @@ $circle.addEventListener('click', (e) => {
 
     if (a !== '' && sign !== '') {
         $output.innerText = a;
-        HISTORY.push(str1.concat(' ', a));
+        HISTORY.push([str1, a.toString()]);
+        createHistoryElement(str1, a.toString());
     }
 
     finish = true;
@@ -490,6 +486,50 @@ $circle.addEventListener('click', (e) => {
     decreaseFontSize('');
 });
 
-$history.addEventListener('click', (e) => {
-    console.log(HISTORY)
+function createHistoryElement(info, result) {
+    const $historyDisplay = document.createElement('div');
+    const $historyOutput = document.createElement('p');
+    const $historyResult = document.createElement('p');
+
+    $historyDisplay.classList.add('history-display');
+    $historyOutput.classList.add('history-output');
+    $historyResult.classList.add('history-result');
+
+    $historyDisplay.appendChild($historyOutput);
+    $historyDisplay.appendChild($historyResult);
+
+    $historyOutput.innerText = info;
+    $historyResult.innerText = result;
+
+    $historyDiv.insertAdjacentElement('afterbegin', $historyDisplay)
+}
+
+function deleteHistory() {
+    const $historyItems = Array.from(document.querySelectorAll('.history-display'));
+    $historyItems.forEach(item => {
+        item.remove();
+    })
+    HISTORY = [];
+};
+
+$historyBtn.addEventListener('click', (e) => {
+    const $historyItems = Array.from(document.querySelectorAll('.history-display'));
+
+    $historyDiv.classList.toggle('history-div-clicked');
+    $line0.classList.toggle('line0-history');
+    $line1.classList.toggle('line1-history');
+    $circle.classList.toggle('circle-history');
+    
+    $historyItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+            clearAll();
+            a = item.querySelector('.history-result').innerText;
+            $outputInfo.innerText = item.querySelector('.history-output').innerText;
+            $output.innerText = a;
+            $historyDiv.classList.remove('history-div-clicked');
+            $circle.classList.remove('circle-history');
+            $line0.classList.remove('line0-history');
+            $line1.classList.remove('line1-history');
+        })
+    })
 });
