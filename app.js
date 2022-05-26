@@ -107,6 +107,10 @@ function createRipple(event) {
       ripple.remove()
     }
     
+    setTimeout(() => {
+        circle.remove();
+    }, 450);
+
     button.appendChild(circle);
 }
 

@@ -26,7 +26,7 @@ span.ripple {
     transform: scale(0);
     position: absolute;
     border-radius: 50%;
-    animation: ripple 450ms linear;
+    animation: ripple 450ms linear infinite;
 }
 @keyframes ripple {
     to {
@@ -56,10 +56,12 @@ span.ripple {
     width: 100px;
     border-radius: 50%;
     box-shadow: 0 6px 10px 0 rgba(0,0,0,0.14), 0 1px 18px 0 rgba(0,0,0,0.12), 0 3px 5px 0 rgba(0,0,0,0.20);
-    transition: all 0.4s ease-out;
+    transition: all 0.5s ease-out;
     z-index: 1;
     top: 0%;
     left: 0%;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 
 .line {
@@ -161,14 +163,14 @@ span.ripple {
 .circle-clicked {
     height: 58px;
     width: 58px;
-    transition: all 0.5s ease-out;
+    /* transition: all 0.5s ease-out;  */
     top: calc(329px - 47px);
     left: calc(165px - 54px);
 }
 
 .line0-clicked {
     animation: none;
-    transition: all 0.5s ease-in-out;
+    transition: all 0.3s ease-in-out;
     transform: rotate(90deg);
     top: 5%;
     width: 7px;
@@ -177,11 +179,11 @@ span.ripple {
 
 .line1-clicked {
     animation: none;
+    transition: all 0.3s ease-in-out;
     transform: rotate(90deg);
     bottom: 5%;
     width: 7px;
     height: 37px;
-    transition: all 0.5s ease-in-out;
 }
 
 .display {
@@ -231,11 +233,8 @@ span.ripple {
     background-color: white;
     box-shadow: 0 6px 10px 0 rgba(0,0,0,0.14), 0 1px 18px 0 rgba(0,0,0,0.12), 0 3px 5px 0 rgba(0,0,0,0.20);
     touch-action: manipulation;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
-
-/* .button:hover {
-    background-color: #ddd;
-} */
 
 .button p {
     position: absolute;
@@ -260,11 +259,13 @@ span.ripple {
     box-shadow: 0 6px 10px 0 rgba(0,0,0,0.14), 0 1px 18px 0 rgba(0,0,0,0.12), 0 3px 5px 0 rgba(0,0,0,0.20);
     cursor: pointer;
     z-index: 3;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 
 .history-span {
     font-size: 0px;
-    transition: all 0.25s ease-in-out;
+    transition: font-size 0.25s ease-in-out;
 }
 
 .history-span-clicked {
@@ -281,7 +282,7 @@ span.ripple {
     border-radius: 18px;
     background-color: #eee;
     overflow: hidden;
-    transition: all 0.4s ease-in-out;
+    transition: all 0.3s ease-in-out;
 }
 
 .history-div-clicked {
@@ -321,19 +322,19 @@ span.ripple {
 }
 
 .line0-history {
-    transition: all 0.25s ease-in-out;
+    transition: all 0.2s ease-in;
     transform: rotate(-45deg);
     top: 18%;
 }
 
 .line1-history {
-    transition: all 0.25s ease-in-out;
+    transition: all 0.2s ease-in;
     transform: rotate(45deg);
     bottom: 18%;
 }
 
 .circle-history {
-    transition: all 0.25s ease-in-out;
+    transition: background-color 0.2s ease-in-out;
     background-color: #ad1a1a;
 };
 
