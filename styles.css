@@ -26,11 +26,11 @@ span.ripple {
     transform: scale(0);
     position: absolute;
     border-radius: 50%;
-    animation: ripple 400ms linear;
+    animation: ripple 450ms linear;
 }
 @keyframes ripple {
     to {
-      transform: scale(3);
+      transform: scale(4);
       opacity: (0);
     }
 }
@@ -230,11 +230,12 @@ span.ripple {
     border-radius: 50%;
     background-color: white;
     box-shadow: 0 6px 10px 0 rgba(0,0,0,0.14), 0 1px 18px 0 rgba(0,0,0,0.12), 0 3px 5px 0 rgba(0,0,0,0.20);
+    touch-action: manipulation;
 }
 
-.button:hover {
+/* .button:hover {
     background-color: #ddd;
-}
+} */
 
 .button p {
     position: absolute;

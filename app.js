@@ -15,32 +15,14 @@ let finish = false; // true if equal is finished properly
 let equalClicked = 0; // the number of clicks on equal button, can't be more than two, it's костыль
 let signChanged = false; // shows that sign is changed 
 let signWithoutB = '';
-// let ClearAllClicked = false;
 
 const DIGITS = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
 const ACTIONS = ['+', '−', '×', '÷', 'xⁿ'];
 const ACTIONSwithoutB = ['√', 'x²', '1/x', '%', '+/−'];
 
-let HISTORY = [];
-
 const $output = document.querySelector('.result');
 const $outputInfo = document.querySelector('.output');
 const $buttons = Array.from(document.querySelectorAll('.button'));
-
-// function isFiniteCutNumber(num) {
-//     if (num.toString().length > 18) {
-//             // if (num.toString().length > 26) {
-//             //     num = BigNumber(num).toExponential(10).toString();
-//             //     return num;
-//             // }
-//             if (BigNumber(num).isFinite()) {
-//                 num = BigNumber(num).toString().substring(0,18);
-//             } else {
-//                 num = BigNumber(num).toExponential(10).toString();
-//             }
-//         };
-//     return num;    
-// }
 
 function isFiniteCutNumber(num) {
     if (BigNumber(num).toFixed().length > 18) {
@@ -465,9 +447,14 @@ $buttons.forEach(button => {
 });
 
 
-$circle.addEventListener('click', (e)=> {
-    createRipple(e);
-    console.log(e.clientX, e.currentTarget.offsetLeft, e.currentTarget.offsetParent);
+$circle.addEventListener('click', (e) => {
+    if (equalClicked < 2) {
+        equalClicked += 1;
+    };
+
+    if (equalClicked > 1) {
+        createRipple(e);
+    };
 
     if ($historyDiv.classList.contains('history-div-clicked')) {
         deleteHistory();
@@ -478,11 +465,6 @@ $circle.addEventListener('click', (e)=> {
     $calcDiv.classList.add('calc-div-clicked');
     $line0.classList.add('line0-clicked');
     $line1.classList.add('line1-clicked');
-
-
-    if (equalClicked < 2) {
-        equalClicked += 1;
-    };
     
     if (a === '' && equalClicked > 1) {
         a = '0';
@@ -528,7 +510,6 @@ $circle.addEventListener('click', (e)=> {
 
     if (a !== '' && sign !== '') {
         $output.innerText = a.toString();
-        HISTORY.push([str1, a.toString()]);
         if (a.toString() !== 'Infinity' && a.toString().length <= 18) {
             createHistoryElement(str1, a.toString());
         }
@@ -579,7 +560,6 @@ function deleteHistory() {
     $line0.classList.remove('line0-history');
     $line1.classList.remove('line1-history');
     $historySpan.classList.remove('history-span-clicked');
-    HISTORY = [];
 };
 
 $historyBtn.addEventListener('click', (e) => {
