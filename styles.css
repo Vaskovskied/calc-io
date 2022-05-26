@@ -19,6 +19,22 @@ body {
     height: 100vh;
 }
 
+span.ripple {
+    background-color: rgba(0, 0, 20, 0.1);
+    top: 0;
+    left: 0;
+    transform: scale(0);
+    position: absolute;
+    border-radius: 50%;
+    animation: ripple 400ms linear;
+}
+@keyframes ripple {
+    to {
+      transform: scale(3);
+      opacity: (0);
+    }
+}
+
 .unselectable {
     -webkit-touch-callout: none;
     -webkit-user-select: none;
@@ -30,6 +46,7 @@ body {
 
 .circle {
     position: relative;
+    overflow: hidden;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -50,6 +67,7 @@ body {
     background: #fff;
     width: 12px;
     height: 64px;
+    z-index: 2;
 }
 
 .circle:not(.circle-clicked):hover {
@@ -196,6 +214,10 @@ body {
 }
 
 .button {
+    position: relative;
+    top: 0%;
+    left: 0%;
+    overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -208,6 +230,14 @@ body {
     border-radius: 50%;
     background-color: white;
     box-shadow: 0 6px 10px 0 rgba(0,0,0,0.14), 0 1px 18px 0 rgba(0,0,0,0.12), 0 3px 5px 0 rgba(0,0,0,0.20);
+}
+
+.button:hover {
+    background-color: #ddd;
+}
+
+.button p {
+    position: absolute;
 }
 
 #plus-btn, #minus-btn, #multiply-btn, #divide-btn, #delete-btn {
@@ -260,13 +290,15 @@ body {
 }
 
 .history-display {
+    position: relative;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
     height: auto;
     width: 100%;
     margin-bottom: 18px;
-    font-size: 24px;
+    font-size: 18px;
     text-align: right;
     padding: 8px 26px 8px 26px;
     cursor: pointer;
@@ -278,7 +310,7 @@ body {
 
 .history-output {
     font-weight: 400;
-    font-size: 18px;
+    font-size: 14px;
 }
 
 .history-result {

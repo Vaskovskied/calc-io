@@ -27,6 +27,37 @@ const $output = document.querySelector('.result');
 const $outputInfo = document.querySelector('.output');
 const $buttons = Array.from(document.querySelectorAll('.button'));
 
+// function isFiniteCutNumber(num) {
+//     if (num.toString().length > 18) {
+//             // if (num.toString().length > 26) {
+//             //     num = BigNumber(num).toExponential(10).toString();
+//             //     return num;
+//             // }
+//             if (BigNumber(num).isFinite()) {
+//                 num = BigNumber(num).toString().substring(0,18);
+//             } else {
+//                 num = BigNumber(num).toExponential(10).toString();
+//             }
+//         };
+//     return num;    
+// }
+
+function isFiniteCutNumber(num) {
+    if (BigNumber(num).toFixed().length > 18) {
+           num = BigNumber(num).toPrecision(16);
+           if (num.length > 18 && num.length <= 21) {
+                num = BigNumber(num).toPrecision(13);
+           }
+           if (num.length === 22) {
+            num = BigNumber(num).toPrecision(12);
+           }
+           if (num.length === 23) {
+            num = BigNumber(num).toPrecision(11);
+           }
+    };
+    return num;    
+};
+
 function decreaseFontSize(btnText) {
     let outputFontSize = parseInt(window.getComputedStyle($output).fontSize);
     let outputInfoFontSize = parseInt(window.getComputedStyle($outputInfo).fontSize);
@@ -59,7 +90,6 @@ function clearAll() {
     signWithoutB = '';
     finish = false;
     signChanged = false;
-    // ClearAllClicked = false;
     $output.innerText = '0';
     $outputInfo.innerText = '';
     $output.style.fontSize = '36px';
@@ -67,6 +97,9 @@ function clearAll() {
 };
 
 function overflowError() {
+    if ($output.innerText.length === 19 && $output.innerText[0] === '-') {
+        return
+    }
     if ($output.innerText.length > 18 || $output.innerText === 'Infinity') {
     $output.innerText = 'Overflow error';
     $outputInfo.innerText = 'You maliciously or curiously try to break program. The clear all function will be executed in 3 seconds';
@@ -75,8 +108,31 @@ function overflowError() {
     }
 }
 
+function createRipple(event) {
+    const button = event.currentTarget;
+    const rect = button.getBoundingClientRect()
+    const circle = document.createElement('span');
+    const diameter = Math.max(button.clientWidth, button.clientHeight);
+    const radius = diameter / 2;
+    
+    circle.style.width = circle.style.height = `${diameter}px`;
+    circle.style.left = `${event.clientX - (rect.left + radius)}px`;
+    circle.style.top = `${event.clientY - (rect.top + radius)}px`;
+    circle.classList.add("ripple"); 
+    const ripple = button.getElementsByClassName("ripple")[0];
+    
+    if (ripple) {
+      ripple.remove()
+    }
+    
+    button.appendChild(circle);
+}
+
 $buttons.forEach(button => {
     button.addEventListener('click', (e) => {
+        createRipple(e);
+        
+
         const btnText = button.innerText;
         //special buttons
 
@@ -239,9 +295,7 @@ $buttons.forEach(button => {
             if (b !== '' && a !== '' && signChanged === false && equalClicked > 1) {
                 $outputInfo.innerText = `${a}/100`;
                 a = BigNumber(a).dividedBy(100);
-                if (a.toString().length > 18) {
-                    a = BigNumber(a).toExponential(10);
-                };
+                a = isFiniteCutNumber(a);
                 $output.innerText = a;
                 
                 signWithoutB = '';
@@ -257,9 +311,7 @@ $buttons.forEach(button => {
                     } 
                     $outputInfo.innerText = `${a} ${sign} ${BigNumber(b)}%`;
                     b = BigNumber(b).dividedBy(100);
-                    if (b.toString().length > 18) {
-                        b = BigNumber(b).toExponential(10);
-                    };
+                    b = isFiniteCutNumber(b);
                     $output.innerText = b;;
                 }
                 if (sign === '+' || sign === '−') {
@@ -268,9 +320,7 @@ $buttons.forEach(button => {
                     }
                     $outputInfo.innerText = `${a} ${sign} ${BigNumber(b)}%`;
                     b = BigNumber(a).multipliedBy(BigNumber(b).dividedBy(100));
-                    if (b.toString().length > 18) {
-                        b = BigNumber(b).toExponential(10);
-                    };
+                    b = isFiniteCutNumber(b);
                     $output.innerText = b;
                 };
             }
@@ -288,9 +338,7 @@ $buttons.forEach(button => {
                 } else {
                     $outputInfo.innerText  = `1/${a}`;
                     a = BigNumber(1).dividedBy(a);
-                    if (a.toString().length > 18) {
-                        a = BigNumber(a).toExponential(10);
-                    };
+                    a = isFiniteCutNumber(a);
                     $output.innerText = a;
     
                     signWithoutB = '';
@@ -304,10 +352,7 @@ $buttons.forEach(button => {
                     } else {
                         $outputInfo.innerText = `1/${a}`;
                         a = BigNumber(1).dividedBy(a);
-                        
-                        if (a.toString().length > 18) {
-                            a = BigNumber(a).toExponential(10);
-                        };
+                        a = isFiniteCutNumber(a);
                         $output.innerText = a;
                     }
                 } else {
@@ -318,17 +363,12 @@ $buttons.forEach(button => {
                     } else if (b.toString() === '') {
                         $outputInfo.innerText = `${a} ${sign} 1/${a}`;
                         b = BigNumber(1).dividedBy(a);
-
-                        if (b.toString().length > 18) {
-                            b = BigNumber(b).toExponential(10);
-                        };
+                        b = isFiniteCutNumber(b);
                         $output.innerText = b;
                     } else {
                         $outputInfo.innerText = `${a} ${sign} 1/${b}`;
                         b = BigNumber(1).dividedBy(b);
-                        if (b.toString().length > 18) {
-                            b = BigNumber(b).toExponential(10);
-                        };
+                        b = isFiniteCutNumber(b);
                         $output.innerText = b;
                     }
                 }
@@ -340,9 +380,7 @@ $buttons.forEach(button => {
             if (b !== '' && a !== '' && signChanged === false && equalClicked > 1) {
                 $outputInfo.innerText  = `${a}²`;
                 a =  BigNumber(a).exponentiatedBy(2);
-                if (a.toString().length > 18) {
-                    a = BigNumber(a).toExponential(10);
-                };
+                a  =isFiniteCutNumber(a);
                 $output.innerText = a;
                 signWithoutB = '';
             } else {
@@ -352,9 +390,7 @@ $buttons.forEach(button => {
                     }
                     $outputInfo.innerText = `${a}²`;
                     a = BigNumber(a).exponentiatedBy(2);
-                    if (a.toString().length > 18) {
-                        a = BigNumber(a).toExponential(10);
-                    };
+                    a = isFiniteCutNumber(a);
                     $output.innerText = a;
                 } else {
                     if (b.toString() === '') {
@@ -362,9 +398,7 @@ $buttons.forEach(button => {
                     }
                     $outputInfo.innerText = `${a} ${sign} ${b}²`
                     b = BigNumber(b).exponentiatedBy(2);
-                    if (b.toString().length > 18) {
-                        b = BigNumber(b).toExponential(10);
-                    };
+                    b = isFiniteCutNumber(a);
                     $output.innerText = b;
                     }
                 };
@@ -375,9 +409,7 @@ $buttons.forEach(button => {
             if (b !== '' && a !== '' && signChanged === false && equalClicked > 1) {
                 $outputInfo.innerText  = `√${a}`;
                 a = BigNumber(a).squareRoot();
-                if (a.toString().length > 18) {
-                    a = BigNumber(a).toExponential(10);
-                };
+                a = isFiniteCutNumber(a);
                 $output.innerText = a;
 
                 signWithoutB = '';
@@ -388,9 +420,7 @@ $buttons.forEach(button => {
                     };
                     $outputInfo.innerText = `√${a}`;
                     a = BigNumber(a).squareRoot();
-                    if (a.toString().length > 18) {
-                        a = BigNumber(a).toExponential(10);
-                    };
+                    a = isFiniteCutNumber(a);
                     $output.innerText = a;
                 } else {
                     if (b === '') {
@@ -398,9 +428,7 @@ $buttons.forEach(button => {
                     };
                     $outputInfo.innerText = `${a} ${sign} √${b}`;
                     b = BigNumber(b).squareRoot();
-                    if (b.toString().length > 18) {
-                        b = BigNumber(b).toExponential(10);
-                    };
+                    b = isFiniteCutNumber(b)
                     $output.innerText = b;
                 };
             }
@@ -414,10 +442,8 @@ $buttons.forEach(button => {
                 signWithoutB = '';
             } else {
                 if (b === '' && sign === '') {
-                        // if (a === '') { show 0, 0 }
                         if (a === '') {
                             $output.innerText = '0';
-                            // $outputInfo.innerText = '0';
                         } else {
                             a = BigNumber(a).negated();
                             $output.innerText = a;
@@ -439,7 +465,10 @@ $buttons.forEach(button => {
 });
 
 
-$circle.addEventListener('click', (e) => {
+$circle.addEventListener('click', (e)=> {
+    createRipple(e);
+    console.log(e.clientX, e.currentTarget.offsetLeft, e.currentTarget.offsetParent);
+
     if ($historyDiv.classList.contains('history-div-clicked')) {
         deleteHistory();
         return;
@@ -495,9 +524,7 @@ $circle.addEventListener('click', (e) => {
             break;
     };
 
-    if (a.toString().length > 18) {
-        a = BigNumber(a).toExponential(10);
-    };
+    a = isFiniteCutNumber(a);
 
     if (a !== '' && sign !== '') {
         $output.innerText = a.toString();
@@ -575,6 +602,7 @@ $historyBtn.addEventListener('click', (e) => {
     
     $historyItems.forEach(item => {
         item.addEventListener('click', (e) => {
+            createRipple(e);
             clearAll();
             a = item.querySelector('.history-result').innerText;
             $outputInfo.innerText = item.querySelector('.history-output').innerText;
