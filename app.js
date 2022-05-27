@@ -1,5 +1,4 @@
 'use strict';
-// import BigNumber from './bignumber/bignumber.mjs';
 
 const $circle = document.getElementById('equal')
 const $calcDiv = document.querySelector('.calc-div');
@@ -556,9 +555,12 @@ function deleteHistory() {
     const $historyItems = Array.from(document.querySelectorAll('.history-display'));
     const $historySpan = $historyBtn.querySelector('span');
 
-    $historyItems.forEach(item => {
-        item.remove();
-    })
+    // $historyItems.forEach(item => {
+    //     item.remove();
+    // })
+    while ($historyDiv.firstChild) {
+        $historyDiv.removeChild($historyDiv.firstChild);
+    }
     $historyDiv.classList.remove('history-div-clicked');
     $circle.classList.remove('circle-history');
     $line0.classList.remove('line0-history');
@@ -570,7 +572,7 @@ $historyBtn.addEventListener('click', (e) => {
     const $historyItems = Array.from(document.querySelectorAll('.history-display'));
     const $historySpan = $historyBtn.querySelector('span');
 
-    if ($historyItems.length === 0) {
+    if ($historyDiv.hasChildNodes() === false) {
         createHistoryElement('', 'History is empty', true);
     } else {
         if (document.getElementById("empty_message")) {
