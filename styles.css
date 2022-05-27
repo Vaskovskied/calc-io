@@ -56,7 +56,10 @@ span.ripple {
     width: 100px;
     border-radius: 50%;
     box-shadow: 0 6px 10px 0 rgba(0,0,0,0.14), 0 1px 18px 0 rgba(0,0,0,0.12), 0 3px 5px 0 rgba(0,0,0,0.20);
-    transition: all 0.5s ease-out;
+    /* transition: all 0.5s ease-out; */
+    transition-property: transform, width, height, top, left;
+    transition-duration: 0.5s;
+    transition-timing-function: ease-out;
     z-index: 1;
     top: 0%;
     left: 0%;
@@ -149,7 +152,10 @@ span.ripple {
     height: 0;
     width: 0;
     overflow: hidden;
-    transition: all 0.5s ease-out;
+    /* transition: all 0.5s ease-out; */
+    transition-property: height, width;
+    transition-duration: 0.5s;
+    transition-timing-function: ease-out;
     z-index: 0;
 }
 
@@ -169,8 +175,11 @@ span.ripple {
 }
 
 .line0-clicked {
+    /* transition: all 0.3s ease-in-out;*/
+    transition-property: transform, top, width, height;
+    transition-duration: 0.3s;
+    transition-timing-function: ease-in-out;
     animation: none;
-    transition: all 0.3s ease-in-out;
     transform: rotate(90deg);
     top: 5%;
     width: 7px;
@@ -178,8 +187,11 @@ span.ripple {
 }
 
 .line1-clicked {
+    /* transition: all 0.3s ease-in-out;*/
+    transition-property: transform, bottom, width, height;
+    transition-duration: 0.3s;
+    transition-timing-function: ease-in-out;
     animation: none;
-    transition: all 0.3s ease-in-out;
     transform: rotate(90deg);
     bottom: 5%;
     width: 7px;
@@ -275,20 +287,33 @@ span.ripple {
 .history-div {
     z-index: 2;
     position: absolute;
-    top: 0;
+    top: 62px;
     left: 0;
     height: 0%;
     width: 100%;
-    border-radius: 18px;
+    border-radius: 0 0 18px 18px;
     background-color: #eee;
     overflow: hidden;
-    transition: all 0.3s ease-in-out;
+    /* transition: height padding 0.4s ease-in-out; */
+    transition-property: height, padding;
+    transition-duration: 0.35s;
+    transition-timing-function: ease-in-out;
 }
 
 .history-div-clicked {
-    overflow-y: auto;
-    padding: 22.5% 0 80px;
-    height: 100%;
+    overflow-y: scroll;
+
+    /* padding: 22.5% 0 80px;
+    height: 100%; */
+    height: calc(100% - 62px);
+    padding: 18px 0 80px;
+
+    -ms-overflow-style: none;
+    overflow: -moz-scrollbars-none;
+}
+
+.history-div-clicked::-webkit-scrollbar {
+    width: 0;
 }
 
 .history-display {
@@ -304,6 +329,8 @@ span.ripple {
     text-align: right;
     padding: 8px 26px 8px 26px;
     cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 
 .history-display:hover {
@@ -322,13 +349,19 @@ span.ripple {
 }
 
 .line0-history {
-    transition: all 0.2s ease-in;
+    /* transition: all 0.2s ease-in; */
+    transition-property: transform, top;
+    /* transition-duration: 0.2s; */
+    transition-timing-function: ease-in;
     transform: rotate(-45deg);
     top: 18%;
 }
 
 .line1-history {
-    transition: all 0.2s ease-in;
+    /* transition: all 0.2s ease-in; */
+    transition-property: transform, bottom;
+    /* transition-duration: 0.2s; */
+    transition-timing-function: ease-in;
     transform: rotate(45deg);
     bottom: 18%;
 }
@@ -361,7 +394,7 @@ span.ripple {
 }
 
 /* for galaxy fold */
-@media screen and (max-width: 300px) {
+@media screen and (max-width: 330px) {
     html {
         transform: scale(0.75)
     }
