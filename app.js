@@ -539,6 +539,7 @@ function createHistoryElement(info, result, emptiness) {
     $historyDisplay.appendChild($historyOutput);
     $historyDisplay.appendChild($historyResult);
 
+
     $historyOutput.innerText = info;
     $historyResult.innerText = result;
 
@@ -546,18 +547,29 @@ function createHistoryElement(info, result, emptiness) {
 
     if (emptiness) {
         if (emptiness = true) {
-            $historyDisplay.id = 'empty_message'
+            $historyDisplay.id = 'empty_message';
+            $historyDisplay.style.cursor = 'default'
+            return;
         }
     }
+
+    $historyDisplay.addEventListener('click', (e) => {
+        createRipple(e);
+        clearAll();
+        a = $historyDisplay.querySelector('.history-result').innerText;
+        $outputInfo.innerText = $historyDisplay.querySelector('.history-output').innerText;
+        $output.innerText = a;
+        $historyDiv.classList.remove('history-div-clicked');
+        $circle.classList.remove('circle-history');
+        $line0.classList.remove('line0-history');
+        $line1.classList.remove('line1-history');
+        $historyBtn.querySelector('span').classList.remove('history-span-clicked');
+        decreaseFontSize('');
+    });
 }
 
 function deleteHistory() {
-    const $historyItems = Array.from(document.querySelectorAll('.history-display'));
     const $historySpan = $historyBtn.querySelector('span');
-
-    // $historyItems.forEach(item => {
-    //     item.remove();
-    // })
     while ($historyDiv.firstChild) {
         $historyDiv.removeChild($historyDiv.firstChild);
     }
@@ -569,7 +581,6 @@ function deleteHistory() {
 };
 
 $historyBtn.addEventListener('click', (e) => {
-    const $historyItems = Array.from(document.querySelectorAll('.history-display'));
     const $historySpan = $historyBtn.querySelector('span');
 
     if ($historyDiv.hasChildNodes() === false) {
@@ -585,20 +596,4 @@ $historyBtn.addEventListener('click', (e) => {
     $line1.classList.toggle('line1-history');
     $circle.classList.toggle('circle-history');
     $historySpan.classList.toggle('history-span-clicked');
-    
-    $historyItems.forEach(item => {
-        item.addEventListener('click', (e) => {
-            createRipple(e);
-            clearAll();
-            a = item.querySelector('.history-result').innerText;
-            $outputInfo.innerText = item.querySelector('.history-output').innerText;
-            $output.innerText = a;
-            $historyDiv.classList.remove('history-div-clicked');
-            $circle.classList.remove('circle-history');
-            $line0.classList.remove('line0-history');
-            $line1.classList.remove('line1-history');
-            $historySpan.classList.remove('history-span-clicked');
-            decreaseFontSize('');
-        })
-    })
 });

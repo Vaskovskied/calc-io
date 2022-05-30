@@ -296,7 +296,6 @@ span.ripple {
     border-radius: 0 0 18px 18px;
     background-color: #eee;
     overflow: hidden;
-    /* transition: height padding 0.4s ease-in-out; */
     transition-property: height, padding;
     transition-duration: 0.35s;
     transition-timing-function: ease-in-out;
@@ -304,9 +303,6 @@ span.ripple {
 
 .history-div-clicked {
     overflow-y: scroll;
-
-    /* padding: 22.5% 0 80px;
-    height: 100%; */
     height: calc(100% - 62px);
     padding: 18px 0 80px;
 
@@ -351,18 +347,14 @@ span.ripple {
 }
 
 .line0-history {
-    /* transition: all 0.2s ease-in; */
     transition-property: transform, top;
-    /* transition-duration: 0.2s; */
     transition-timing-function: ease-in;
     transform: rotate(-45deg);
     top: 18%;
 }
 
 .line1-history {
-    /* transition: all 0.2s ease-in; */
     transition-property: transform, bottom;
-    /* transition-duration: 0.2s; */
     transition-timing-function: ease-in;
     transform: rotate(45deg);
     bottom: 18%;
@@ -372,7 +364,6 @@ span.ripple {
     transition: background-color 0.2s ease-in-out;
     background-color: #ad1a1a;
 };
-
 
 @media screen and (max-width: 800px) {
     .display {
