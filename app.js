@@ -6,6 +6,9 @@ const $line0 = document.querySelector('.line0');
 const $line1 = document.querySelector('.line1');
 const $historyBtn = document.querySelector('.history');
 const $historyDiv = document.querySelector('.history-div');
+const $output = document.querySelector('.result');
+const $outputInfo = document.querySelector('.output');
+const $buttons = Array.from(document.querySelectorAll('.button'));
 
 let a = ''; // first number
 let b = ''; // second number
@@ -13,17 +16,13 @@ let sign = '' // math sign
 let finish = false; // true if equal is finished properly
 let equalClicked = 0; // the number of clicks on equal button, can't be more than two, it's костыль
 let signChanged = false; // shows that sign is changed 
-let signWithoutB = '';
+let signWithoutB = ''; // sign that not using b
 
 const DIGITS = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
 const ACTIONS = ['+', '−', '×', '÷', 'xⁿ'];
 const ACTIONSwithoutB = ['√', 'x²', '1/x', '%', '+/−'];
 
-const $output = document.querySelector('.result');
-const $outputInfo = document.querySelector('.output');
-const $buttons = Array.from(document.querySelectorAll('.button'));
-
-function isFiniteCutNumber(num) {
+function convertTo18symbols(num) {
     if (BigNumber(num).toFixed().length > 18) {
            num = BigNumber(num).toPrecision(16);
            if (num.length > 18 && num.length <= 21) {
@@ -62,7 +61,7 @@ function decreaseFontSize(btnText) {
             $outputInfo.style.fontSize = `${24/$outputInfo.innerText.length * 14 + 2}px`
         }
     }
-}
+};
 
 function clearAll() {
     a = '';
@@ -111,7 +110,60 @@ function createRipple(event) {
     }, 450);
 
     button.appendChild(circle);
-}
+};
+
+function createHistoryElement(info, result, emptiness) {
+    const $historyDisplay = document.createElement('div');
+    const $historyOutput = document.createElement('p');
+    const $historyResult = document.createElement('p');
+
+    $historyDisplay.classList.add('history-display');
+    $historyOutput.classList.add('history-output');
+    $historyResult.classList.add('history-result');
+
+    $historyDisplay.appendChild($historyOutput);
+    $historyDisplay.appendChild($historyResult);
+
+
+    $historyOutput.innerText = info;
+    $historyResult.innerText = result;
+
+    $historyDiv.insertAdjacentElement('afterbegin', $historyDisplay)
+
+    if (emptiness) {
+        if (emptiness = true) {
+            $historyDisplay.id = 'empty_message';
+            $historyDisplay.style.cursor = 'default'
+            return;
+        }
+    }
+
+    $historyDisplay.addEventListener('click', (e) => {
+        createRipple(e);
+        clearAll();
+        a = $historyDisplay.querySelector('.history-result').innerText;
+        $outputInfo.innerText = $historyDisplay.querySelector('.history-output').innerText;
+        $output.innerText = a;
+        $historyDiv.classList.remove('history-div-clicked');
+        $circle.classList.remove('circle-history');
+        $line0.classList.remove('line0-history');
+        $line1.classList.remove('line1-history');
+        $historyBtn.querySelector('span').classList.remove('history-span-clicked');
+        decreaseFontSize('');
+    });
+};
+
+function deleteHistory() {
+    const $historySpan = $historyBtn.querySelector('span');
+    while ($historyDiv.firstChild) {
+        $historyDiv.removeChild($historyDiv.firstChild);
+    }
+    $historyDiv.classList.remove('history-div-clicked');
+    $circle.classList.remove('circle-history');
+    $line0.classList.remove('line0-history');
+    $line1.classList.remove('line1-history');
+    $historySpan.classList.remove('history-span-clicked');
+};
 
 $buttons.forEach(button => {
     button.addEventListener('click', (e) => {
@@ -280,7 +332,7 @@ $buttons.forEach(button => {
             if (b !== '' && a !== '' && signChanged === false && equalClicked > 1) {
                 $outputInfo.innerText = `${a}/100`;
                 a = BigNumber(a).dividedBy(100);
-                a = isFiniteCutNumber(a);
+                a = convertTo18symbols(a);
                 $output.innerText = a;
                 
                 signWithoutB = '';
@@ -296,7 +348,7 @@ $buttons.forEach(button => {
                     } 
                     $outputInfo.innerText = `${a} ${sign} ${BigNumber(b)}%`;
                     b = BigNumber(b).dividedBy(100);
-                    b = isFiniteCutNumber(b);
+                    b = convertTo18symbols(b);
                     $output.innerText = b;;
                 }
                 if (sign === '+' || sign === '−') {
@@ -305,7 +357,7 @@ $buttons.forEach(button => {
                     }
                     $outputInfo.innerText = `${a} ${sign} ${BigNumber(b)}%`;
                     b = BigNumber(a).multipliedBy(BigNumber(b).dividedBy(100));
-                    b = isFiniteCutNumber(b);
+                    b = convertTo18symbols(b);
                     $output.innerText = b;
                 };
             }
@@ -323,7 +375,7 @@ $buttons.forEach(button => {
                 } else {
                     $outputInfo.innerText  = `1/${a}`;
                     a = BigNumber(1).dividedBy(a);
-                    a = isFiniteCutNumber(a);
+                    a = convertTo18symbols(a);
                     $output.innerText = a;
     
                     signWithoutB = '';
@@ -337,7 +389,7 @@ $buttons.forEach(button => {
                     } else {
                         $outputInfo.innerText = `1/${a}`;
                         a = BigNumber(1).dividedBy(a);
-                        a = isFiniteCutNumber(a);
+                        a = convertTo18symbols(a);
                         $output.innerText = a;
                     }
                 } else {
@@ -348,12 +400,12 @@ $buttons.forEach(button => {
                     } else if (b.toString() === '') {
                         $outputInfo.innerText = `${a} ${sign} 1/${a}`;
                         b = BigNumber(1).dividedBy(a);
-                        b = isFiniteCutNumber(b);
+                        b = convertTo18symbols(b);
                         $output.innerText = b;
                     } else {
                         $outputInfo.innerText = `${a} ${sign} 1/${b}`;
                         b = BigNumber(1).dividedBy(b);
-                        b = isFiniteCutNumber(b);
+                        b = convertTo18symbols(b);
                         $output.innerText = b;
                     }
                 }
@@ -365,7 +417,7 @@ $buttons.forEach(button => {
             if (b !== '' && a !== '' && signChanged === false && equalClicked > 1) {
                 $outputInfo.innerText  = `${a}²`;
                 a =  BigNumber(a).exponentiatedBy(2);
-                a  =isFiniteCutNumber(a);
+                a  =convertTo18symbols(a);
                 $output.innerText = a;
                 signWithoutB = '';
             } else {
@@ -375,7 +427,7 @@ $buttons.forEach(button => {
                     }
                     $outputInfo.innerText = `${a}²`;
                     a = BigNumber(a).exponentiatedBy(2);
-                    a = isFiniteCutNumber(a);
+                    a = convertTo18symbols(a);
                     $output.innerText = a;
                 } else {
                     if (b.toString() === '') {
@@ -383,7 +435,7 @@ $buttons.forEach(button => {
                     }
                     $outputInfo.innerText = `${a} ${sign} ${b}²`
                     b = BigNumber(b).exponentiatedBy(2);
-                    b = isFiniteCutNumber(a);
+                    b = convertTo18symbols(a);
                     $output.innerText = b;
                     }
                 };
@@ -394,7 +446,7 @@ $buttons.forEach(button => {
             if (b !== '' && a !== '' && signChanged === false && equalClicked > 1) {
                 $outputInfo.innerText  = `√${a}`;
                 a = BigNumber(a).squareRoot();
-                a = isFiniteCutNumber(a);
+                a = convertTo18symbols(a);
                 $output.innerText = a;
 
                 signWithoutB = '';
@@ -405,7 +457,7 @@ $buttons.forEach(button => {
                     };
                     $outputInfo.innerText = `√${a}`;
                     a = BigNumber(a).squareRoot();
-                    a = isFiniteCutNumber(a);
+                    a = convertTo18symbols(a);
                     $output.innerText = a;
                 } else {
                     if (b === '') {
@@ -413,7 +465,7 @@ $buttons.forEach(button => {
                     };
                     $outputInfo.innerText = `${a} ${sign} √${b}`;
                     b = BigNumber(b).squareRoot();
-                    b = isFiniteCutNumber(b)
+                    b = convertTo18symbols(b)
                     $output.innerText = b;
                 };
             }
@@ -449,7 +501,6 @@ $buttons.forEach(button => {
     })
 });
 
-
 $circle.addEventListener('click', (e) => {
     if (equalClicked < 2) {
         equalClicked += 1;
@@ -464,10 +515,12 @@ $circle.addEventListener('click', (e) => {
         return;
     };
 
-    $circle.classList.add('circle-clicked');
-    $calcDiv.classList.add('calc-div-clicked');
-    $line0.classList.add('line0-clicked');
-    $line1.classList.add('line1-clicked');
+    if (equalClicked === 1) {
+        $circle.classList.add('circle-clicked');
+        $calcDiv.classList.add('calc-div-clicked');
+        $line0.classList.add('line0-clicked');
+        $line1.classList.add('line1-clicked');
+    }
     
     if (a === '' && equalClicked > 1) {
         a = '0';
@@ -509,7 +562,7 @@ $circle.addEventListener('click', (e) => {
             break;
     };
 
-    a = isFiniteCutNumber(a);
+    a = convertTo18symbols(a);
 
     if (a !== '' && sign !== '') {
         $output.innerText = a.toString();
@@ -526,59 +579,6 @@ $circle.addEventListener('click', (e) => {
 
     decreaseFontSize('');
 });
-
-function createHistoryElement(info, result, emptiness) {
-    const $historyDisplay = document.createElement('div');
-    const $historyOutput = document.createElement('p');
-    const $historyResult = document.createElement('p');
-
-    $historyDisplay.classList.add('history-display');
-    $historyOutput.classList.add('history-output');
-    $historyResult.classList.add('history-result');
-
-    $historyDisplay.appendChild($historyOutput);
-    $historyDisplay.appendChild($historyResult);
-
-
-    $historyOutput.innerText = info;
-    $historyResult.innerText = result;
-
-    $historyDiv.insertAdjacentElement('afterbegin', $historyDisplay)
-
-    if (emptiness) {
-        if (emptiness = true) {
-            $historyDisplay.id = 'empty_message';
-            $historyDisplay.style.cursor = 'default'
-            return;
-        }
-    }
-
-    $historyDisplay.addEventListener('click', (e) => {
-        createRipple(e);
-        clearAll();
-        a = $historyDisplay.querySelector('.history-result').innerText;
-        $outputInfo.innerText = $historyDisplay.querySelector('.history-output').innerText;
-        $output.innerText = a;
-        $historyDiv.classList.remove('history-div-clicked');
-        $circle.classList.remove('circle-history');
-        $line0.classList.remove('line0-history');
-        $line1.classList.remove('line1-history');
-        $historyBtn.querySelector('span').classList.remove('history-span-clicked');
-        decreaseFontSize('');
-    });
-}
-
-function deleteHistory() {
-    const $historySpan = $historyBtn.querySelector('span');
-    while ($historyDiv.firstChild) {
-        $historyDiv.removeChild($historyDiv.firstChild);
-    }
-    $historyDiv.classList.remove('history-div-clicked');
-    $circle.classList.remove('circle-history');
-    $line0.classList.remove('line0-history');
-    $line1.classList.remove('line1-history');
-    $historySpan.classList.remove('history-span-clicked');
-};
 
 $historyBtn.addEventListener('click', (e) => {
     const $historySpan = $historyBtn.querySelector('span');
