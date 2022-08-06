@@ -1,5 +1,5 @@
 # calc-io
-## :warning::warning::warning: Project is old, so code clarity is a weak spot. :warning::warning::warning: ##
+> :warning::warning::warning: Project is old, so code clarity is a weak spot :warning::warning::warning: 
 
 A beautiful, powerful and flexible calculator.
 
